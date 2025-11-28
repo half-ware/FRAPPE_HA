@@ -2,6 +2,8 @@
 
 Frappe HA
 
+App de synchronisation bidirectionnelle pour Frappe/ERPNext.
+
 ### Installation
 
 You can install this app using the [bench](https://github.com/frappe/bench) CLI:
