@@ -1,7 +1,7 @@
 [project]
 name = "frappe_ha"
 authors = [
-    { name = "Said TAZI", email = "said.tazi@half-ware.com"}
+    { name = "Said TAZI", email = "contact@half-ware.com"}
 ]
 description = "Frappe HA"
 requires-python = ">=3.10"

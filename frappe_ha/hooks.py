@@ -2,7 +2,7 @@ app_name = "frappe_ha"
 app_title = "Frappe HA"
 app_publisher = "Said TAZI"
 app_description = "Frappe HA"
-app_email = "said.tazi@half-ware.com"
+app_email = "contact@half-ware.com"
 app_license = "mit"
 
 # Apps
