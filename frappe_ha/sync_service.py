@@ -80,6 +80,8 @@ def process_queue():
     if not target:
         return
 
+    target = f"https://{target}"
+
     if not site_key or not site_secret:
         frappe.logger().warning("frappe_ha: Missing sync_api_key or sync_api_secret in site_config.json")
         return
