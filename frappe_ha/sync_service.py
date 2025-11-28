@@ -32,6 +32,8 @@ def _save_log(doc, action):
     # don't log sync log itself
     if getattr(doc, "doctype", None) == "Sync Log":
         return
+    if getattr(doc, "doctype", None) == "Sync Log Settings":
+        return
 
     # If doc has flags.from_sync skip
     try:
