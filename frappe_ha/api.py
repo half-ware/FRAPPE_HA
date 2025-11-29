@@ -4,7 +4,7 @@ import json
 from .conflict import resolve_conflict
 
 @frappe.whitelist(allow_guest=False)
-def apply_change(doctype, docname, data, action):
+def apply_change(doctype, docname, data, action, traget):
     """
     Entrypoint API pour appliquer une modification reçue depuis un autre site.
     - data : dict serialisé du document (inclut owner, modified, version...)
@@ -35,8 +35,8 @@ def apply_change(doctype, docname, data, action):
     exists = frappe.db.exists(doctype, docname)
 
     # Pre-actions (we don't do anything but accept them)
-    if action in ["pre_insert", "pre_submit", "pre_cancel", "pre_delete"]:
-        return {"status": "ok"}
+    #if action in ["pre_insert", "pre_submit", "pre_cancel", "pre_delete"]:
+    #    return {"status": "ok"}
 
     # INSERT
     if action == "insert":
@@ -51,7 +51,7 @@ def apply_change(doctype, docname, data, action):
                 except Exception:
                     pass
             frappe.db.commit()
-            return {"status": "ok", "name": new_doc.name}
+            return {"status": "ok", "name": new_doc.name, "target":target}
         else:
             # if exists, we try to merge
             local = frappe.get_doc(doctype, docname).as_dict()
@@ -60,7 +60,7 @@ def apply_change(doctype, docname, data, action):
             doc.flags.from_sync = True
             doc.save(ignore_permissions=True)
             frappe.db.commit()
-            return {"status": "ok", "name": doc.name}
+            return {"status": "ok", "name": doc.name, "target":target}
 
     # UPDATE
     if action == "update":
@@ -75,7 +75,7 @@ def apply_change(doctype, docname, data, action):
                 except Exception:
                     pass
             frappe.db.commit()
-            return {"status": "ok", "name": new_doc.name}
+            return {"status": "ok", "name": new_doc.name, "target":target}
 
         doc = frappe.get_doc(doctype, docname)
         local = doc.as_dict()
@@ -100,7 +100,7 @@ def apply_change(doctype, docname, data, action):
             except Exception:
                 pass
         frappe.db.commit()
-        return {"status": "ok", "name": doc.name}
+        return {"status": "ok", "name": doc.name, "target":target}
 
     # SUBMIT
     if action == "submit":
@@ -122,7 +122,7 @@ def apply_change(doctype, docname, data, action):
         # if already submitted skip
         try:
             if doc.docstatus == 1:
-                return {"status": "ok", "name": doc.name}
+                return {"status": "ok", "name": doc.name, "target":target}
         except Exception:
             pass
 
@@ -139,39 +139,39 @@ def apply_change(doctype, docname, data, action):
             doc.submit()
         except Exception as e:
             # submit may fail due to validations; return error
-            return {"status": "error", "error": str(e)}
+            return {"status": "error", "error": str(e), "target":target}
 
         frappe.db.commit()
-        return {"status": "ok", "name": doc.name}
+        return {"status": "ok", "name": doc.name, "target":target}
 
     # CANCEL
     if action == "cancel":
         if not exists:
-            return {"status": "error", "error": "document_not_found"}
+            return {"status": "error", "error": "document_not_found", "target":target}
 
         doc = frappe.get_doc(doctype, docname)
         # if not submitted nothing to cancel
         if doc.docstatus != 1:
-            return {"status": "ok", "name": doc.name}
+            return {"status": "ok", "name": doc.name, "target":target}
 
         doc.flags.from_sync = True
         try:
             doc.cancel()
         except Exception as e:
-            return {"status": "error", "error": str(e)}
+            return {"status": "error", "error": str(e), "target":target}
 
         frappe.db.commit()
-        return {"status": "ok", "name": doc.name}
+        return {"status": "ok", "name": doc.name, "target":target}
 
     # DELETE
     if action == "delete":
-        if exists:
+        if exists:0
             try:
                 frappe.delete_doc(doctype, docname, force=1, ignore_permissions=True)
                 frappe.db.commit()
-                return {"status": "ok"}
+                return {"status": "ok", "target":target}
             except Exception as e:
-                return {"status": "error", "error": str(e)}
-        return {"status": "ok", "note": "not_exists"}
+                return {"status": "error", "error": str(e), "target":target}
+        return {"status": "ok", "note": "not_exists", "target":target}
 
-    return {"status": "error", "error": "unknown_action"}
+    return {"status": "error", "error": "unknown_action", "target":target}

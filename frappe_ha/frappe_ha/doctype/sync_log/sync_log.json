@@ -9,7 +9,8 @@
   "json_data",
   "action",
   "status",
-  "timestamp"
+  "timestamp",
+  "error_message"
  ],
  "fields": [
   {
@@ -43,12 +44,17 @@
    "fieldname": "timestamp",
    "fieldtype": "Datetime",
    "label": "timestamp"
+  },
+  {
+   "fieldname": "error_message",
+   "fieldtype": "Long Text",
+   "label": "Error Message"
   }
  ],
  "grid_page_length": 50,
  "in_create": 1,
  "links": [],
- "modified": "2025-11-29 00:23:16.677966",
+ "modified": "2025-11-29 12:59:32.459635",
  "modified_by": "Administrator",
  "module": "Frappe HA",
  "name": "Sync Log",

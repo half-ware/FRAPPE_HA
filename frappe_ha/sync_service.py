@@ -28,6 +28,31 @@ def serialize_doc(doc):
 
     return data
 
+
+def get_last_version(doctype, docname):
+    """Return last Version row for this document."""
+    versions = frappe.get_all(
+        "Version",
+        filters={
+            "ref_doctype": doctype,
+            "docname": docname
+        },
+        fields=["name", "creation", "data"],
+        order_by="creation desc",
+        limit=1
+    )
+
+    if versions:
+        v = versions[0]
+        # Parse JSON
+        try:
+            v["data"] = json.loads(v["data"])
+        except Exception:
+            pass
+        return v
+
+    return None
+
 def _save_log(doc, action):
     # don't log sync log itself
     if getattr(doc, "doctype", None) == "Sync Log":
@@ -35,6 +60,10 @@ def _save_log(doc, action):
     if getattr(doc, "doctype", None) == "Sync Log Settings":
         return
     if getattr(doc, "doctype", None) == "Comment":
+        return
+    if getattr(doc, "doctype", None) == "Route History":
+        return
+    if getattr(doc, "doctype", None) == "Scheduled Job Log":
         return
 
     # If doc has flags.from_sync skip
@@ -52,20 +81,21 @@ def _save_log(doc, action):
         "docname": doc.name,
         "json_data": json.dumps(data, default=str),
         "action": action,
+        "timestamp": doc.modified,
         "status": "queued",
     })
     log.insert(ignore_permissions=True)
     frappe.db.commit()
 
 # enqueue functions for all triggers
-def enqueue_before_insert(doc, method): _save_log(doc, ACTIONS["PRE_INSERT"])
+#def enqueue_before_insert(doc, method): _save_log(doc, ACTIONS["PRE_INSERT"])
 def enqueue_after_insert(doc, method): _save_log(doc, ACTIONS["INSERT"])
 def enqueue_update(doc, method): _save_log(doc, ACTIONS["UPDATE"])
-def enqueue_before_submit(doc, method): _save_log(doc, ACTIONS["PRE_SUBMIT"])
+#def enqueue_before_submit(doc, method): _save_log(doc, ACTIONS["PRE_SUBMIT"])
 def enqueue_submit(doc, method): _save_log(doc, ACTIONS["SUBMIT"])
-def enqueue_before_cancel(doc, method): _save_log(doc, ACTIONS["PRE_CANCEL"])
+#def enqueue_before_cancel(doc, method): _save_log(doc, ACTIONS["PRE_CANCEL"])
 def enqueue_cancel(doc, method): _save_log(doc, ACTIONS["CANCEL"])
-def enqueue_pre_delete(doc, method): _save_log(doc, ACTIONS["PRE_DELETE"])
+#def enqueue_pre_delete(doc, method): _save_log(doc, ACTIONS["PRE_DELETE"])
 def enqueue_delete(doc, method): _save_log(doc, ACTIONS["DELETE"])
 
 # Process queue
@@ -124,6 +154,7 @@ def send_to_remote(target, key, secret, log):
         "docname": log.docname,
         "data": json.loads(log.json_data),
         "action": log.action,
+        "target": url,
     }
 
     r = requests.post(url, headers=headers, json=payload, timeout=15)
