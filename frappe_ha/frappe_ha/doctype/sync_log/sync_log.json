@@ -1,6 +1,5 @@
 {
  "actions": [],
- "allow_rename": 1,
  "creation": "2025-11-28 22:55:01.785868",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -47,9 +46,9 @@
   }
  ],
  "grid_page_length": 50,
- "index_web_pages_for_search": 1,
+ "in_create": 1,
  "links": [],
- "modified": "2025-11-28 22:56:08.004202",
+ "modified": "2025-11-29 00:23:16.677966",
  "modified_by": "Administrator",
  "module": "Frappe HA",
  "name": "Sync Log",

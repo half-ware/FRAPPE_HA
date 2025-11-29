@@ -34,6 +34,8 @@ def _save_log(doc, action):
         return
     if getattr(doc, "doctype", None) == "Sync Log Settings":
         return
+    if getattr(doc, "doctype", None) == "Comment":
+        return
 
     # If doc has flags.from_sync skip
     try:
