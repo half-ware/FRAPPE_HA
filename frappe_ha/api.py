@@ -3,7 +3,7 @@ import frappe
 import json
 from .conflict import resolve_conflict
 
-@frappe.whitelist(allow_guest=False)
+@frappe.whitelist(allow_guest=True)
 def apply_change(doctype, docname, data, action, traget):
     """
     Entrypoint API pour appliquer une modification reçue depuis un autre site.

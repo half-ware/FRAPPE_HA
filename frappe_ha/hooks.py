@@ -139,14 +139,10 @@ app_license = "mit"
 
 doc_events = {
 	"*": {
-#		"before_insert": "frappe_ha.sync_service.enqueue_before_insert",
 		"after_insert": "frappe_ha.sync_service.enqueue_after_insert",
 		"on_update": "frappe_ha.sync_service.enqueue_update",
-#		"before_submit": "frappe_ha.sync_service.enqueue_before_submit",
 		"on_submit": "frappe_ha.sync_service.enqueue_submit",
-#		"before_cancel": "frappe_ha.sync_service.enqueue_before_cancel",
 		"on_cancel": "frappe_ha.sync_service.enqueue_cancel",
-#		"before_delete": "frappe_ha.sync_service.enqueue_pre_delete",
 		"on_trash": "frappe_ha.sync_service.enqueue_delete",
 	}
 }
